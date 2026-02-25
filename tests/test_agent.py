@@ -1,25 +1,19 @@
 import pytest
-from ichatbio.agent_response import DirectResponse, ProcessBeginResponse, ProcessLogResponse, ArtifactResponse, \
-    ResponseMessage
+import pytest_asyncio
+from ichatbio.agent_response import ArtifactResponse
 
-from src.agent import HelloWorldAgent
+from agent import INaturalistAgent
+
+
+@pytest_asyncio.fixture()
+def agent():
+    return INaturalistAgent()
 
 
 @pytest.mark.asyncio
-async def test_hello_world(context, messages):
-    # The test `context` populates the `messages` list with the agent's responses
-    await HelloWorldAgent().run(context, "Hi", "hello", None)
+async def test_search_inaturalist_observations(agent, context, messages):
+    await agent.run(context, "Find observations of Rattus rattus", "search_inaturalist_observations", None)
 
-    # Message objects are restricted to the following types:
-    messages: list[ResponseMessage]
-
-    # We can test all the agent's responses at once
-    assert messages == [
-        ProcessBeginResponse("Thinking"),
-        ProcessLogResponse("Hello world!"),
-        ArtifactResponse(mimetype="text/html",
-                         description="The Wikipedia page for \"Hello World\"",
-                         uris=["https://en.wikipedia.org/wiki/Hello_World"],
-                         metadata={'source': 'Wikipedia'}),
-        DirectResponse("I said it!")
-    ]
+    artifact = next((m for m in messages if isinstance(m, ArtifactResponse)), None)
+    assert artifact
+    assert artifact.mimetype == "application/json"

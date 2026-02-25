@@ -1,7 +1,9 @@
 import pytest
+import dotenv
 
 from ichatbio.agent_response import ResponseChannel, ResponseContext, ResponseMessage
 
+dotenv.load_dotenv()
 
 class InMemoryResponseChannel(ResponseChannel):
     """
