@@ -15,7 +15,7 @@ class INaturalistAgent(IChatBioAgent):
         return AgentCard(
             name="iNaturalist Observation Search",
             description="Searches for observations in iNaturalist (https://inaturalist.org).",
-            icon=None,
+            icon='https://static.inaturalist.org/wiki_page_attachments/3154-medium.png',
             entrypoints=[
                 search_inaturalist_observations.entrypoint
             ]
