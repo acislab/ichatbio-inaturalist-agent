@@ -11,7 +11,7 @@ from instructor.exceptions import InstructorRetryException
 from openai import AsyncOpenAI
 from tenacity import AsyncRetrying
 
-from util import AIGenerationException, StopOnTerminalErrorOrMaxAttempts
+from util import AIGenerationException, StopOnTerminalErrorOrMaxAttempts, get_llm_client_kwargs
 from schema import LLMGeneration
 
 # This description helps iChatBio understand when to call this entrypoint
@@ -127,9 +127,9 @@ def build_query_url(api_url: str, params: dict) -> str:
 
 
 async def _generate_observations_params(request: str):
-    model = os.getenv("AGENTS_LLM", "gpt-5.2")
+    model = os.getenv("LLM", os.getenv("AGENTS_LLM", "gpt-5.2"))
     try:
-        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(api_key=os.getenv("INATURALIST_API_KEY")))
+        client: AsyncInstructor = instructor.from_openai(AsyncOpenAI(**get_llm_client_kwargs()))
         result = await client.chat.completions.create(
             model=model,
             temperature=0,

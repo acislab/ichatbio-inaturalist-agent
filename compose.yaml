@@ -3,5 +3,5 @@ services:
     build:
       context: .
     ports:
-      - "9999:9999"
+      - "29205:9999"
     restart: unless-stopped

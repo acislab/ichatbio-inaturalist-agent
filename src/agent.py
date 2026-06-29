@@ -1,4 +1,4 @@
-from typing import override, Optional
+from typing import Any, override, Optional
 
 import dotenv
 from ichatbio.agent import IChatBioAgent
@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from starlette.applications import Starlette
 
 from entrypoints import search_inaturalist_observations
+from util import update_llm_credentials
 
 
 class INaturalistAgent(IChatBioAgent):
@@ -25,7 +26,15 @@ class INaturalistAgent(IChatBioAgent):
         )
 
     @override
-    async def run(self, context: ResponseContext, request: str, entrypoint: str, params: Optional[BaseModel]):
+    async def run(
+        self,
+        context: ResponseContext,
+        request: str,
+        entrypoint: str,
+        params: Optional[BaseModel],
+        metadata: dict[str, Any] | None = None,
+    ):
+        update_llm_credentials(metadata)
         match entrypoint:
             case search_inaturalist_observations.entrypoint.id:
                 await search_inaturalist_observations.run(context, request)
