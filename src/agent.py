@@ -9,7 +9,7 @@ from pydantic import BaseModel
 from starlette.applications import Starlette
 
 from entrypoints import search_inaturalist_observations
-from util import update_llm_credentials
+from util import set_llm_credentials
 
 
 class INaturalistAgent(IChatBioAgent):
@@ -34,7 +34,7 @@ class INaturalistAgent(IChatBioAgent):
         params: Optional[BaseModel],
         metadata: dict[str, Any] | None = None,
     ):
-        update_llm_credentials(metadata)
+        set_llm_credentials(metadata)
         match entrypoint:
             case search_inaturalist_observations.entrypoint.id:
                 await search_inaturalist_observations.run(context, request)
