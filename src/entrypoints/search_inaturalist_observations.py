@@ -36,7 +36,7 @@ DO NOT guess.
 
 If a specific field is not implied or mentioned, leave it out.
 
-Dates must be in yyyy-mm-dd, yyyy-mm, or yyyy format where applicable.
+Dates must be in yyyy-mm-dd format. To filter by a whole year or a month, use the year or month fields instead of a partial date.
 
 Boolean values must be expressed as true or false.
 
@@ -44,7 +44,7 @@ Use enums and constrained values exactly as specified in the schema:
 
 license, photo_license, order_by, quality_grade, etc. must be from their allowed list.
 
-If multiple values are specified for fields like iconic_taxa or has, include them as lists.
+If multiple values are specified for iconic_taxa, include them as a list.
 """
 
 
@@ -108,21 +108,26 @@ async def query_inaturalist_observations(api_query_url):
         return code, response.is_success, data
 
 
+def _format_value(value) -> str:
+    # The API only understands lowercase true/false. Python's str(True) is "True", which it silently ignores.
+    # bool must be checked before anything else because bool is a subclass of int.
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    return str(value)
+
+
 def build_query_url(api_url: str, params: dict) -> str:
     query_items = []
 
     for key, value in params.items():
         if isinstance(value, list):
+            list_key = key if key.endswith("[]") else f"{key}[]"
             for item in value:
-                # Append `key[]` if it's a list-style param (e.g. has[], iconic_taxa[])
-                if key.endswith('[]'):
-                    query_items.append((key, item))
-                else:
-                    query_items.append((f"{key}[]", item))
+                query_items.append((list_key, _format_value(item)))
         else:
-            query_items.append((key, value))
+            query_items.append((key, _format_value(value)))
 
-    query_string = urlencode(query_items, doseq=True, quote_via=quote_plus)
+    query_string = urlencode(query_items, quote_via=quote_plus)
     return f"{api_url}?{query_string}"
 
 
