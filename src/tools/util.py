@@ -93,6 +93,14 @@ def capture_messages(context: ResponseContext):
 # 1024 px image).
 PHOTO_SIZE = "original"
 
+# Without the "fields" parameter, the v2 API returns only an observation's uuid. "all" returns every field, which is
+# the same data the v1 API returned.
+OBSERVATION_FIELDS = "all"
+
+# Parameters added to every search unless the generated search parameters set them. A random order prevents unexpected
+# clustering when only a subset of the matching records can be retrieved.
+DEFAULT_PARAMS = {"order_by": "random"}
+
 _PHOTO_URL = re.compile(r"/(?:square|thumb|small|medium|large|original)\.(\w+)((?:\?.*)?)$", re.IGNORECASE)
 
 
